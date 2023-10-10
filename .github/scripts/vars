@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -e
+
+# Use production project if we are on main
+if [ "$(git branch --show-current)" = main ]; then
+    PROJECT_ID="pulze-infra"
+    PROJECT_NUMBER="314773425242"
+else
+    PROJECT_ID="pulze-infra-dev"
+    PROJECT_NUMBER="154979810474"
+fi
+
+cat << EOF > "${GITHUB_OUTPUT}"
+workload_identity_provider=projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/github-1/providers/pulze-github-wi-provider
+service_account=github-ci@${PROJECT_ID}.iam.gserviceaccount.com
+image=us-west1-docker.pkg.dev/${PROJECT_ID}/pulzeai-$(basename "${PWD}")
+version=$("$(dirname $0)"/version)
+EOF

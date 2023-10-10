@@ -1,0 +1,38 @@
+name: Build and Push Base Images
+
+on: push
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      matrix:
+        image: [base, devtools, devenv]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - id: vars
+        run: .github/scripts/vars
+      - uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: ${{ steps.vars.outputs.workload_identity_provider }}
+          service_account: ${{ steps.vars.outputs.service_account }}
+      - uses: google-github-actions/setup-gcloud@v1
+      - run: |
+          gcloud auth configure-docker us-west1-docker.pkg.dev
+      - uses: docker/build-push-action@v5
+        with:
+          platforms: linux/amd64,linux/arm64
+          push: true
+          target: ${{ matrix.image }}
+          tags: ${{ steps.vars.outputs.image }}/${{ matrix.image }}:${{ steps.vars.outputs.version }}
