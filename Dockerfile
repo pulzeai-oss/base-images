@@ -4,7 +4,8 @@ ENV DEBCONF_NONINTERACTIVE_SEEN true
 ENV DEBIAN_FRONTEND noninteractive
 ENV PULZE_HOME /pulze
 ENV VIRTUAL_ENV ${PULZE_HOME}/lib/venv
-ENV PATH ${VIRTUAL_ENV}/bin:${POETRY_HOME}/bin:${PATH}
+ENV SOURCE_DIR ${PULZE_HOME}/src
+ENV PATH ${VIRTUAL_ENV}/bin:${PULZE_HOME}/bin:${PATH}
 
 # Copy configuration
 COPY etc /etc
@@ -26,6 +27,9 @@ RUN mkdir -p ${PULZE_HOME}/bin ${PULZE_HOME}/lib ${PULZE_HOME}/share
 # Set up virtual environment
 RUN python -m venv ${VIRTUAL_ENV}
 
+# Set working directory
+WORKDIR ${SOURCE_DIR}
+
 # Set entrypoint
 ENTRYPOINT [ "/usr/bin/tini", "-g", "--" ]
 
@@ -39,7 +43,7 @@ ENV PATH ${POETRY_HOME}/bin:${PATH}
 
 # Install development tools
 RUN apt-get update && apt-get install build-essential curl git make tmux vim
-RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN curl -sSL https://install.python-poetry.org | /usr/local/bin/python -
 
 
 FROM devtools AS devenv
@@ -52,7 +56,3 @@ ONBUILD RUN test -n "${UID-}" && test -n "${GID-}"
 ONBUILD RUN getent group ${GID} || groupadd --gid ${GID} dev
 ONBUILD RUN useradd --no-log-init --create-home --uid ${UID} --gid ${GID} dev \
     && chown -R ${UID}:${GID} ${VIRTUAL_ENV}
-
-# Set working directory
-ONBUILD ENV SOURCE_DIR ${PULZE_HOME}/src
-ONBUILD WORKDIR ${SOURCE_DIR}
