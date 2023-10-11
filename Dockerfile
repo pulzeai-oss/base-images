@@ -34,6 +34,8 @@ FROM base AS devtools
 
 ENV POETRY_HOME ${PULZE_HOME}/lib/poetry
 ENV POETRY_VERSION "1.6.1"
+ENV POETRY_VIRTUALENVS_CREATE false
+ENV PATH ${POETRY_HOME}/bin:${PATH}
 
 # Install development tools
 RUN apt-get update && apt-get install build-essential curl git make tmux vim
