@@ -89,7 +89,7 @@ RUN apt-get update && apt-get install \
     xvfb
 
 # Install core development packages
-RUN npm install -g prettier pnpm@8.2.0
+RUN npm install -g prettier pnpm@8.14.1
 
 # Create nonroot account
 RUN groupadd --gid 65532 nonroot \
