@@ -63,9 +63,10 @@ FROM node:18.15.0-bullseye-slim AS node-devtools
 
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 ENV DEBIAN_FRONTEND noninteractive
+ENV PNPM_HOME /pnpm
 ENV PULZE_HOME /pulze
 ENV SOURCE_DIR ${PULZE_HOME}/src
-ENV PATH ${PULZE_HOME}/bin:${PATH}
+ENV PATH ${PNPM_HOME}:${PULZE_HOME}/bin:${PATH}
 
 # Copy configuration
 COPY etc /etc
