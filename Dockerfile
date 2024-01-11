@@ -90,7 +90,9 @@ RUN apt-get update && apt-get install \
     xvfb
 
 # Install core development packages
-RUN npm install -g cypress@13.6.2 pnpm@8.14.1 prettier
+RUN npm install -g pnpm@8.14.1 prettier
+# https://github.com/cypress-io/cypress/issues/1243
+RUN CI=1 npm install -g cypress@13.6.2
 
 # Create nonroot account
 RUN groupadd --gid 65532 nonroot \
