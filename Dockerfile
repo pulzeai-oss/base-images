@@ -64,6 +64,7 @@ FROM node:18.15.0-bullseye-slim AS node-devtools
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 ENV DEBIAN_FRONTEND noninteractive
 ENV PULZE_HOME /pulze
+ENV CYPRESS_CACHE_FOLDER ${PULZE_HOME}/share/cypress
 ENV PNPM_HOME ${PULZE_HOME}/share/pnpm
 ENV SOURCE_DIR ${PULZE_HOME}/src
 ENV PATH ${PNPM_HOME}:${PULZE_HOME}/bin:${PATH}
@@ -89,7 +90,7 @@ RUN apt-get update && apt-get install \
     xvfb
 
 # Install core development packages
-RUN npm install -g prettier pnpm@8.14.1
+RUN npm install -g cypress@13.6.2 pnpm@8.14.1 prettier
 
 # Create nonroot account
 RUN groupadd --gid 65532 nonroot \
