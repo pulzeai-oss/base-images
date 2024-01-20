@@ -1,4 +1,7 @@
-FROM python:3.11.6-slim-bullseye AS base
+FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:460.0.0-debian_component_based AS google-cloud-sdk
+
+
+FROM python:3.11.7-slim-bullseye AS base
 
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 ENV DEBIAN_FRONTEND noninteractive
@@ -37,10 +40,13 @@ ENTRYPOINT [ "/usr/bin/tini", "-g", "--" ]
 
 FROM base AS devtools
 
+ENV CLOUDSDK_HOME ${PULZE_HOME}/lib/google-cloud-sdk
 ENV POETRY_HOME ${PULZE_HOME}/lib/poetry
-ENV POETRY_VERSION "1.6.1"
+ENV POETRY_VERSION "1.7.1"
 ENV POETRY_VIRTUALENVS_CREATE false
-ENV PATH ${POETRY_HOME}/bin:${PATH}
+ENV PATH ${CLOUDSDK_HOME}/bin:${POETRY_HOME}/bin:${PATH}
+
+COPY --from=google-cloud-sdk /google-cloud-sdk ${CLOUDSDK_HOME}
 
 # Install development tools
 RUN apt-get update && apt-get install build-essential curl git make tmux vim
