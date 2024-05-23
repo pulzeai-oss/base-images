@@ -1,7 +1,7 @@
-FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:460.0.0-debian_component_based AS google-cloud-sdk
+FROM gcr.io/google.com/cloudsdktool/google-cloud-cli:477.0.0-debian_component_based AS google-cloud-sdk
 
 
-FROM python:3.11.7-slim-bullseye AS base
+FROM python:3.11.9-slim-bookworm AS base
 
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 ENV DEBIAN_FRONTEND noninteractive
@@ -38,14 +38,29 @@ WORKDIR ${SOURCE_DIR}
 ENTRYPOINT [ "/usr/bin/tini", "-g", "--" ]
 
 
+FROM base AS aws-cli
+
+ENV AWS_CLI_VERSION "2.15.56"
+
+# Install AWS CLI v2
+RUN apt-get update && apt-get install curl unzip \
+    && mkdir -p /tmp/aws-cli \
+    && cd /tmp/aws-cli \
+    && curl -sSL -o awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip \
+    && unzip awscliv2.zip \
+    && aws/install --install-dir ${PULZE_HOME}/lib/aws-cli --bin-dir ${PULZE_HOME}/bin \
+    && rm -rf /tmp/aws-cli
+
+
 FROM base AS devtools
 
 ENV CLOUDSDK_HOME ${PULZE_HOME}/lib/google-cloud-sdk
 ENV POETRY_HOME ${PULZE_HOME}/lib/poetry
-ENV POETRY_VERSION "1.7.1"
+ENV POETRY_VERSION "1.8.3"
 ENV POETRY_VIRTUALENVS_CREATE false
 ENV PATH ${CLOUDSDK_HOME}/bin:${POETRY_HOME}/bin:${PATH}
 
+COPY --from=aws-cli ${PULZE_HOME}/ ${PULZE_HOME}/
 COPY --from=google-cloud-sdk /google-cloud-sdk ${CLOUDSDK_HOME}
 
 # Install development tools
