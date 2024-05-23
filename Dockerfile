@@ -64,7 +64,7 @@ COPY --from=aws-cli ${PULZE_HOME}/ ${PULZE_HOME}/
 COPY --from=google-cloud-sdk /google-cloud-sdk ${CLOUDSDK_HOME}
 
 # Install development tools
-RUN apt-get update && apt-get install build-essential curl git make tmux vim
+RUN apt-get update && apt-get install build-essential curl git make ncat tmux vim
 RUN curl -sSL https://install.python-poetry.org | /usr/local/bin/python -
 
 
