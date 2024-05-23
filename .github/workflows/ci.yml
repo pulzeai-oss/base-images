@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      packages: write
     strategy:
       matrix:
         image: [base, devtools, devenv, node-devtools, node-devenv]
