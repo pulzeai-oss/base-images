@@ -48,7 +48,7 @@ RUN <<EOT bash
   case "${TARGETARCH}" in
     amd64) AWS_CLI_ARCH=x86_64 ;;
     arm64) AWS_CLI_ARCH=arm64 ;;
-    *) echo "Unsupported architecture" && exit 1 ;;
+    *) >&2 echo "Unsupported architecture" && exit 1 ;;
   esac
   apt-get update && apt-get install curl unzip \
     && mkdir -p /tmp/aws-cli \
