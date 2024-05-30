@@ -43,13 +43,22 @@ FROM base AS aws-cli
 ENV AWS_CLI_VERSION "2.15.56"
 
 # Install AWS CLI v2
-RUN apt-get update && apt-get install curl unzip \
+RUN <<EOT bash
+  set -eux
+  case "${TARGETARCH}" in
+    amd64) AWS_CLI_ARCH=x86_64 ;;
+    arm64) AWS_CLI_ARCH=arm64 ;;
+    *) echo "Unsupported architecture" && exit 1 ;;
+  esac
+  apt-get update && apt-get install curl unzip \
     && mkdir -p /tmp/aws-cli \
     && cd /tmp/aws-cli \
-    && curl -sSL -o awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWS_CLI_VERSION}.zip \
+    && /bin/sh -c 
+    && curl -sSL -o awscliv2.zip https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}-${AWS_CLI_VERSION}.zip \
     && unzip awscliv2.zip \
     && aws/install --install-dir ${PULZE_HOME}/lib/aws-cli --bin-dir ${PULZE_HOME}/bin \
     && rm -rf /tmp/aws-cli
+EOT
 
 
 FROM base AS devtools
